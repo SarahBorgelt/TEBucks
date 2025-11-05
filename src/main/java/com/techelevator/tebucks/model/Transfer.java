@@ -7,9 +7,9 @@ public class Transfer {
     private int transferId;
     private String transferType;
     private String transferStatus;
-    private String transferUserFrom;
-    private String transferUserTo;
-    private Float amount;
+    private Integer transferUserFrom;
+    private Integer transferUserTo;
+    private double amount;
 
     public int getTransferId() {
         return transferId;
@@ -35,27 +35,28 @@ public class Transfer {
         this.transferStatus = transferStatus;
     }
 
-    public String getTransferUserFrom() {
-        return transferUserFrom;
-    }
 
-    public void setTransferUserFrom(String transferUserFrom) {
-        this.transferUserFrom = transferUserFrom;
-    }
-
-    public String getTransferUserTo() {
-        return transferUserTo;
-    }
-
-    public void setTransferUserTo(String transferUserTo) {
-        this.transferUserTo = transferUserTo;
-    }
-
-    public Float getAmount() {
+    public double getAmount() {
         return amount;
     }
 
-    public void setAmount(Float amount) {
+    public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public Integer getTransferUserFrom() {
+        return transferUserFrom;
+    }
+
+    public void setTransferUserFrom(Integer transferUserFrom) {
+        this.transferUserFrom = transferUserFrom;
+    }
+
+    public Integer getTransferUserTo() {
+        return transferUserTo;
+    }
+
+    public void setTransferUserTo(Integer transferUserTo) {
+        this.transferUserTo = transferUserTo;
     }
 }

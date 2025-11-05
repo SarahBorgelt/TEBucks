@@ -1,5 +1,8 @@
+--ROLLBACK;
 BEGIN TRANSACTION;
 
+DROP TABLE IF EXISTS account;
+DROP TABLE IF EXISTS transfer;
 DROP TABLE IF EXISTS tebucks_user;
 DROP SEQUENCE IF EXISTS seq_user_id;
 
@@ -22,12 +25,32 @@ CREATE TABLE tebucks_user (
 );
 
 CREATE TABLE transfer(
-	transfer_id SERIAL PRIMARY KEY,
+	transfer_id SERIAL,
 	transfer_type VARCHAR(100),
 	transfer_status VARCHAR(100),
-	user_from VARCHAR(150),
-	user_to VARCHAR(150),
-	amount DECIMAL(10,2)
+	user_from_id INT,
+	user_to_id INT,
+	amount DECIMAL(13,2),
+	CONSTRAINT PK_transfer PRIMARY KEY (transfer_id),
+	CONSTRAINT FK_transfer_user_from_id FOREIGN KEY (user_from_id) REFERENCES tebucks_user(user_id),
+	CONSTRAINT FK_transfer_user_to_id FOREIGN KEY (user_to_id) REFERENCES tebucks_user(user_id),
+	CHECK (amount>=0),
+	CHECK (user_to_id <> user_from_id)
 );
+
+CREATE TABLE account(
+	account_id SERIAL NOT NULL,
+	user_id INT NOT NULL,
+	balance DECIMAL(13,2) NOT NULL,
+	CONSTRAINT PK_account PRIMARY KEY(account_id),
+	CONSTRAINT FK_account_tebucks_user FOREIGN KEY (user_id) REFERENCES tebucks_user(user_id)
+);
+
+INSERT INTO transfer (transfer_status) VALUES('Pending');
+INSERT INTO transfer (transfer_status) VALUES('Approved');
+INSERT INTO transfer (transfer_status) VALUES('Rejected');
+
+INSERT INTO transfer(transfer_type) VALUES('Deposit');
+INSERT INTO transfer(transfer_type) VALUES('Withdraw');
 
 COMMIT;
