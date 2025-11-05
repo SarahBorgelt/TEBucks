@@ -13,9 +13,6 @@ public class NewTransferDto {
     private double transferAmount;
     private String transferType;
 
-
-
-
     public int getTransferUserFrom() {
         return transferUserFrom;
     }

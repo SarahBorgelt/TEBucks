@@ -9,7 +9,7 @@ public interface AccountDao {
 
     List<Account> getAllTransfers();
 
-    Account getTransferById(int id);
+    Account getTransferById(Integer id);
 
     Account newTransfer(int amount);
 
@@ -22,12 +22,6 @@ public interface AccountDao {
     List<Account> viewPendingTransferStatus(String transferStatus);
 
     Account updateMyPendingTransfer(String transferStatus);
-
-
-
-
-
-
 
 
 }
