@@ -8,5 +8,43 @@ package com.techelevator.tebucks.model;
  */
 
 public class NewTransferDto {
+    private int transferUserFrom;
+    private int transferUserTo;
+    private double transferAmount;
+    private String transferType;
 
+
+
+
+    public int getTransferUserFrom() {
+        return transferUserFrom;
+    }
+
+    public void setTransferUserFrom(int transferUserFrom) {
+        this.transferUserFrom = transferUserFrom;
+    }
+
+    public int getTransferUserTo() {
+        return transferUserTo;
+    }
+
+    public void setTransferUserTo(int transferUserTo) {
+        this.transferUserTo = transferUserTo;
+    }
+
+    public double getTransferAmount() {
+        return transferAmount;
+    }
+
+    public void setTransferAmount(double transferAmount) {
+        this.transferAmount = transferAmount;
+    }
+
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
 }
