@@ -1,6 +1,7 @@
 package com.techelevator.tebucks.dao;
 
 import com.techelevator.tebucks.exception.DaoException;
+import com.techelevator.tebucks.model.Account;
 import com.techelevator.tebucks.model.RegisterUserDto;
 import com.techelevator.tebucks.model.User;
 import org.springframework.dao.DataIntegrityViolationException;

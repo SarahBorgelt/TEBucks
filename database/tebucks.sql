@@ -21,4 +21,13 @@ CREATE TABLE tebucks_user (
 	CONSTRAINT UQ_username UNIQUE (username)
 );
 
+CREATE TABLE transfer(
+	transfer_id SERIAL PRIMARY KEY,
+	transfer_type VARCHAR(100),
+	transfer_status VARCHAR(100),
+	user_from VARCHAR(150),
+	user_to VARCHAR(150),
+	amount DECIMAL(10,2)
+);
+
 COMMIT;
