@@ -80,10 +80,10 @@ public class JdbcUserDao implements UserDao {
                 "VALUES (LOWER(TRIM(?)), ?,?,?) RETURNING user_id";
         String password_hash = new BCryptPasswordEncoder().encode(user.getPassword());
         try {
-            int newUserId = jdbcTemplate.queryForObject(sql, int.class, user.getUsername(), password_hash, user.getFirstName(), user.getLastName());
+            int newUserId = jdbcTemplate.queryForObject(sql, Integer.class, user.getUsername(), password_hash, user.getFirstName(), user.getLastName());
             newUser = getUserById(newUserId);
             if (newUser != null) {
-               String accountSql = "INSERT INTO account(account_id, balance) VALUES(?,?);";
+               String accountSql = "INSERT INTO account(user_id, balance) VALUES(?,?);";
                jdbcTemplate.update(accountSql, newUserId, 1000.00);
             }
         } catch (CannotGetJdbcConnectionException e) {

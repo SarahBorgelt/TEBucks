@@ -8,6 +8,7 @@ import com.techelevator.tebucks.exception.DaoException;
 import com.techelevator.tebucks.model.Account;
 import com.techelevator.tebucks.model.Transfer;
 import com.techelevator.tebucks.model.User;
+import com.techelevator.tebucks.service.TearsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,9 @@ public class AccountController {
 
     @Autowired
     TransferDao transferDao;
+
+    @Autowired
+    TearsService tearsService;
 
     @RequestMapping(path="/balance", method = RequestMethod.GET)
     public Account getBalance(Principal principal){
