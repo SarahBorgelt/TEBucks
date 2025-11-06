@@ -35,7 +35,7 @@ public class AccountController {
     @Autowired
     TearsService tearsService;
 
-    @RequestMapping(path="/balance", method = RequestMethod.GET)
+    @RequestMapping(path="/api/account/balance", method = RequestMethod.GET)
     public Account getBalance(Principal principal){
         System.out.println(principal.getName());
         return accountDao.getAccountBalance(principal.getName());
@@ -73,8 +73,8 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "/transfer/{userId}")
-    public Transfer getAllTransfersSentOrReceived(@RequestBody Transfer transfer, @PathVariable int userId){
+    @GetMapping(path = "/transfer/userid/{userId}")
+    public Transfer getAllTransfersSentOrReceived(@PathVariable int userId){
         List<Transfer>getAllTransfersSentOrReceived = null;
         try{
             return (Transfer) transferDao.getAllTransfers(userId);
@@ -83,8 +83,8 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "transfer/{transferId}")
-    public Transfer getTransferById (@RequestBody Transfer transfer, @PathVariable int transferId){
+    @GetMapping(path = "transfer/id/{transferId}")
+    public Transfer getTransferById (@PathVariable int transferId){
         try{
             return (Transfer) transferDao.getTransferById(transferId);
         } catch (DaoException e){
@@ -92,8 +92,8 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "transfer/{transferStatus}")
-    public Transfer viewTransfersByPending (@RequestBody Transfer transfer, @PathVariable String transferStatus){
+    @GetMapping(path = "transfer/status/{transferStatus}")
+    public Transfer viewTransfersByPending (@PathVariable String transferStatus){
         try{
             return (Transfer) transferDao.viewPendingTransferStatus(transferStatus);
         } catch (DaoException e){

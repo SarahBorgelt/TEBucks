@@ -22,7 +22,7 @@ public class JdbcAccountDao implements AccountDao{
     @Override
     public Account getAccountBalance(String username) {
         String sql = "SELECT balance FROM account\n" +
-                "JOIN tebuckers_user ON account.user_id = tebuckers_user.user_id\n" +
+                "JOIN tebucks_user ON account.user_id = tebucks_user.user_id\n" +
                 "WHERE username = ?;\n;";
         try{
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, username);
