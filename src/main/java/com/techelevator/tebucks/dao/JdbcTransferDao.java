@@ -31,11 +31,11 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public List<Transfer> getAllTransfers() {
+    public List<Transfer> getAllTransfers(Integer userId) {
         List<Transfer> transfers = new ArrayList<>();
-        String sql = "SELECT * FROM transfer";
+        String sql = "SELECT * FROM transfer WHERE user_from_id = ? OR user_to_id = ?;";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId, userId);
             while (results.next()) {
                 transfers.add(mapRowToTransfer(results));
             }
@@ -64,7 +64,7 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public Transfer newTransfer(Integer amount, Integer userFrom, Integer userTo, String transferType, String transferStatus) {
+    public Transfer newTransfer(Double amount, Integer userFrom, Integer userTo, String transferType, String transferStatus) {
         if (amount == null) {
             throw new IllegalArgumentException("Amount cannot be null");
         }
@@ -97,7 +97,7 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public Transfer requestTransfer(int amount, String transferFromUser, String transferStatus, int transferFromUserId, int transferToUserId) {
+    public Transfer requestTransfer(Double amount, String transferFromUser, String transferStatus, int transferFromUserId, int transferToUserId) {
         if(amount<=0){
             throw new IllegalArgumentException("Amount must be greater than zero");
         };
@@ -147,4 +147,17 @@ public class JdbcTransferDao implements TransferDao {
             throw new DaoException("Error updating transfer in database", e);
         }
     }
+
+    @Override
+    public Transfer getTransferStatus(String transferStatus, Integer userId, Integer transferId) {
+        String sql = "SELECT * FROM transfer WHERE transferStatus = ? AND (user_from_id = ? OR user_to_id = ?) AND transfer_id = ?;";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transferStatus, userId, userId, transferId);
+        Transfer transferByStatus = null;
+        if(result.next()){
+            transferByStatus = mapRowToTransfer(result);
+        } else {
+            throw new DaoException("Unable to locate requested transfer");
+        } return transferByStatus;
+    }
+
 }
