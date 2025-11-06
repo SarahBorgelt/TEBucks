@@ -3,16 +3,15 @@ package com.techelevator.tebucks.model;
 public class Account {
     int accountId;
     int userId;
+    Double balance;
 
-    public float getBalance() {
-        return balance;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setBalance(float balance) {
-        this.balance = balance;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
-
-    float balance;
 
     public int getAccountId() {
         return accountId;
@@ -20,5 +19,13 @@ public class Account {
 
     public void setAccountId(int accountId) {
         this.accountId = accountId;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
     }
 }
