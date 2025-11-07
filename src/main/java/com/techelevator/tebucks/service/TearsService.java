@@ -2,6 +2,7 @@ package com.techelevator.tebucks.service;
 
 import com.techelevator.tebucks.model.TearsLoginResponeDto;
 import com.techelevator.tebucks.model.Transfer;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,12 +18,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
 public class TearsService {
     private final String TEARS_BASE_URL = "https://tears.azurewebsites.net";
-    private final String LOGIN_ENDPOINT = "/login";
+    private final String LOGIN_ENDPOINT = "/Login";
     private final String LOG_ENDPOINT = "/api/TxLog/";
     private RestClient restClient = RestClient.create(TEARS_BASE_URL);
     private String authToken = null;
@@ -32,6 +34,17 @@ public class TearsService {
 
     @Value("${tears.password}")
     private String tearsPassword;
+
+    @PostConstruct                                       // -------------------------------------ADDED
+    public void init() {
+        try {
+            System.out.println("Attempting automatic TEARS login from TearsService...");
+            loginToTears(tearsUsername, tearsPassword);
+            System.out.println("TEARS login successful!");
+        } catch (Exception e) {
+            System.err.println("TEARS login failed at startup: " + e.getMessage());
+        }
+    }
 
     public String getAuthToken() {
         return authToken;
@@ -49,6 +62,7 @@ public class TearsService {
         restClient = RestClient.builder()
                 .baseUrl(TEARS_BASE_URL)
                 .defaultHeader("Authorization","Bearer " + authToken)
+                .defaultHeader("Content-type", "application/json") //                 <---------------------------ADDED
                 .build();
     }
 
@@ -57,7 +71,7 @@ public class TearsService {
         try {
             restClient.post()
                     .uri(LOG_ENDPOINT)
-                    .contentType(MediaType.APPLICATION_JSON)
+                    //.contentType(MediaType.APPLICATION_JSON)
                     .body(newTransfer)
                     .retrieve()
                     .toBodilessEntity();
@@ -131,6 +145,9 @@ public class TearsService {
             this.authToken = response.getToken();
             System.out.println("Logged in to TEARS successfully. Token: " + this.authToken);
 
+            setAuthToken(this.authToken);                    // --------------------------------------------------------------------------
+
+
         } catch (Exception e) {
             e.printStackTrace(); // Print full stack trace for debugging
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
@@ -143,11 +160,23 @@ public class TearsService {
     public void logTransfer(Transfer transfer) {
         ensureLoggedIn();
 
+        Map<String, Object> tearsPayload = new LinkedHashMap<>();                          //------------------------
+
+        String usernameFrom = (transfer.getUserFrom() != null) ? transfer.getUserFrom().getUsername() : null;
+        String  usernameTo = (transfer.getUserTo() != null) ? transfer.getUserTo().getUsername() : null;
+
+        tearsPayload.put("description", "TEBucks transfer logged automatically");          //---------------------
+        tearsPayload.put("username_from", usernameFrom);
+        tearsPayload.put("username_to", usernameTo);
+        tearsPayload.put("Amount", transfer.getAmount());                                    //-------------------
+        //tearsPayload.put("TransferType", transfer.getTransferType());
+       // tearsPayload.put("TransferStatus", transfer.getTransferStatus());
+
         try {
             restClient.post()
                     .uri(LOG_ENDPOINT)
-                    .header("Content-Type", "application/json")
-                    .body(transfer)
+                    .contentType(MediaType.APPLICATION_JSON)               //-------------------- was header
+                    .body(tearsPayload)
                     .retrieve()
                     .toBodilessEntity();
 
@@ -163,5 +192,6 @@ public class TearsService {
 
     public boolean shouldLogTransfer(Transfer transfer, double senderBalance) {
         return transfer.getAmount() >= 1000 || transfer.getAmount() > senderBalance;
-    }
+   }
+
 }
