@@ -1,5 +1,6 @@
 package com.techelevator.tebucks.controller;
 
+import com.techelevator.tebucks.service.TearsService;
 import jakarta.validation.Valid;
 
 import com.techelevator.tebucks.exception.DaoException;
@@ -27,12 +28,13 @@ public class AuthenticationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserDao userDao;
+    private TearsService tearsService;
 
-    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDao userDao) {
+    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDao userDao, TearsService tearsService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDao = userDao;
-
+        this.tearsService = tearsService;
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.POST)
@@ -64,6 +66,9 @@ public class AuthenticationController {
             } else {
                 userDao.createUser(newUser);
 
+                // Register user in TEARS
+                // Use the TearsService instance (assume it's @Autowired in this controller)
+                tearsService.registerNewUser(newUser.getUsername(), newUser.getPassword());
                 //TODO: The tears service needs to make a request to the post endpoint
                 // to register a new tears account
 

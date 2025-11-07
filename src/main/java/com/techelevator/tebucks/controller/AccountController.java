@@ -57,28 +57,52 @@ public class AccountController {
 
         Account accountFrom = accountDao.getAccountByUserId(newTransferDto.getUserFrom());
         Account accountTo = accountDao.getAccountByUserId(newTransferDto.getUserTo());
+        double senderBalanceBefore = accountFrom.getBalance();
+
+        Transfer transfer;
 
         if ("Send".equalsIgnoreCase(newTransferDto.getTransferType())) {
-            // Sending money
             if (accountFrom.getBalance() < newTransferDto.getAmount()) {
+                // Overdraft attempt → log to TEARS
+                if (tearsService.getAuthToken() != null) {
+                    Transfer overdraftAttempt = new Transfer();
+                    overdraftAttempt.setAmount(newTransferDto.getAmount());
+                    overdraftAttempt.setTransferType("Send");
+                    overdraftAttempt.setTransferStatus("Attempted Overdraft");
+                    overdraftAttempt.setUserFrom(userDao.getUserById(accountFrom.getUserId()));
+                    overdraftAttempt.setUserTo(userDao.getUserById(accountTo.getUserId()));
+                    tearsService.logTransfer(overdraftAttempt);
+                }
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
             }
+
             try {
                 accountDao.sendMoney(newTransferDto.getAmount(), accountFrom.getUserId());
                 accountDao.receiveMoney(newTransferDto.getAmount(), accountTo.getUserId());
 
-                return transferDao.newTransfer(
+                transfer = transferDao.newTransfer(
                         newTransferDto.getAmount(),
                         accountFrom.getUserId(),
                         accountTo.getUserId(),
                         "Send",
                         "Approved"
                 );
+
+                // TEARS logging for large transfers
+                if (tearsService.shouldLogTransfer(transfer, senderBalanceBefore)) {
+                    if (tearsService.getAuthToken() == null) {
+                        tearsService.loginToTears("tearsUsername", "tearsPassword");
+                    }
+                    tearsService.logTransfer(transfer);
+                }
+
+                return transfer;
+
             } catch (DaoException e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Transfer failed", e);
             }
+
         } else if ("Request".equalsIgnoreCase(newTransferDto.getTransferType())) {
-            // Requesting money
             if (newTransferDto.getUserFrom().equals(newTransferDto.getUserTo())) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot request money from yourself");
             }
@@ -97,6 +121,7 @@ public class AccountController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid transfer type");
         }
     }
+
 
 
     @GetMapping(path = "/api/account/transfers")
@@ -129,33 +154,56 @@ public class AccountController {
     }
 
     @PutMapping(path = "/api/transfers/{id}/status")
-    public Transfer updateTransferStatus(@RequestBody TransferStatusUpdateDto transferStatusUpdateDto, Principal principal, @PathVariable Integer id){
-        try{
+    public Transfer updateTransferStatus(@RequestBody TransferStatusUpdateDto transferStatusUpdateDto,
+                                         Principal principal,
+                                         @PathVariable Integer id) {
+        try {
             Transfer transfer = transferDao.getTransferById(id);
-            if(transfer == null){
+            if (transfer == null) {
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer not found");
             }
 
             String newStatus = transferStatusUpdateDto.getTransferStatus();
 
-            if("Approved".equalsIgnoreCase(newStatus)){
-                // Only send money if it was a Request
-                if("Request".equalsIgnoreCase(transfer.getTransferType())){
+            if ("Approved".equalsIgnoreCase(newStatus)) {
+                if ("Request".equalsIgnoreCase(transfer.getTransferType())) {
                     Account payerAccount = accountDao.getAccountByUserId(transfer.getUserFrom().getId());
-                    if(payerAccount.getBalance() < transfer.getAmount()){
+                    double senderBalanceBefore = payerAccount.getBalance();
+
+                    if (payerAccount.getBalance() < transfer.getAmount()) {
+                        // Overdraft attempt → log to TEARS
+                        if (tearsService.getAuthToken() != null) {
+                            Transfer overdraftAttempt = new Transfer();
+                            overdraftAttempt.setAmount(transfer.getAmount());
+                            overdraftAttempt.setTransferType("Request");
+                            overdraftAttempt.setTransferStatus("Attempted Overdraft");
+                            overdraftAttempt.setUserFrom(userDao.getUserById(payerAccount.getUserId()));
+                            overdraftAttempt.setUserTo(userDao.getUserById(transfer.getUserTo().getId()));
+                            tearsService.logTransfer(overdraftAttempt);
+                        }
                         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
                     }
-                    accountDao.sendMoney(transfer.getAmount(), transfer.getUserFrom().getId());
+
+                    accountDao.sendMoney(transfer.getAmount(), payerAccount.getUserId());
                     accountDao.receiveMoney(transfer.getAmount(), transfer.getUserTo().getId());
+
+                    // TEARS logging for large transfers
+                    if (tearsService.shouldLogTransfer(transfer, senderBalanceBefore)) {
+                        if (tearsService.getAuthToken() == null) {
+                            tearsService.loginToTears("tearsUsername", "tearsPassword");
+                        }
+                        tearsService.logTransfer(transfer);
+                    }
                 }
-            } else if(!"Rejected".equalsIgnoreCase(newStatus)){
+            } else if (!"Rejected".equalsIgnoreCase(newStatus)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
             }
 
             return transferDao.updateMyPendingTransfer(id, newStatus);
 
-        } catch(DaoException e){
+        } catch (DaoException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
         }
     }
-    }
+
+}

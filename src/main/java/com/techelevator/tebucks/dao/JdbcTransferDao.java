@@ -46,8 +46,6 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "SELECT * FROM transfer WHERE user_from_id = ? OR user_to_id = ?;";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user.getId(), user.getId());
-            //TODO: Need to translate userId into object and take user object instead of number
-            // Update transfer model to account for user object. Pass in JDBCuserDao.
 
             while (results.next()) {
                 Transfer transfer = mapRowToTransfer(results);
