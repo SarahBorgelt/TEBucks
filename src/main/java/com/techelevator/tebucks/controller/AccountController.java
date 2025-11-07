@@ -6,6 +6,7 @@ import com.techelevator.tebucks.dao.TransferDao;
 import com.techelevator.tebucks.dao.UserDao;
 import com.techelevator.tebucks.exception.DaoException;
 import com.techelevator.tebucks.model.Account;
+import com.techelevator.tebucks.model.NewTransferDto;
 import com.techelevator.tebucks.model.Transfer;
 import com.techelevator.tebucks.model.User;
 import com.techelevator.tebucks.service.TearsService;
@@ -48,11 +49,25 @@ public class AccountController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path ="/api/transfers")
-    public Transfer newTransfer(@RequestBody Transfer transfer){
-        Double amountToTransfer = transfer.getAmount();
+    public Transfer newTransfer(@RequestBody NewTransferDto){
+        if (NewTransferDto.get == null || transfer.getTransferUserTo() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User IDs must not be null");
+        }
+        if (NewTransferDto.ge() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount must be greater than zero");
+        }
+
+        Double amountToTransfer = NewTransferDto.getAmount();
         Account accountFrom = accountDao.getAccountByUserId(transfer.getTransferUserFrom());
         Account accountTo = accountDao.getAccountByUserId(transfer.getTransferUserTo());
 
+        if (NewTransferDto.getTransferUserFrom() == null || transfer.getTransferUserTo() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User IDs must not be null");
+        }
+
+        if (transfer.getAmount() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount must be greater than zero");
+        }
         if(accountFrom.getBalance()<amountToTransfer){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
         }
@@ -73,11 +88,10 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "/api/transfers/{id}")
-    public Transfer getAllTransfersSentOrReceived(@PathVariable int userId){
-        List<Transfer>getAllTransfersSentOrReceived = null;
+    @GetMapping(path = "/api/transfers/{userId}")
+    public List<Transfer> getAllTransfersSentOrReceived(@PathVariable int userId){
         try{
-            return (Transfer) transferDao.getAllTransfers(userId);
+            return transferDao.getAllTransfers(userId);
         } catch (DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
         }

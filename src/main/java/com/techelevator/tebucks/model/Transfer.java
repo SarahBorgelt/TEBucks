@@ -7,8 +7,8 @@ public class Transfer {
     private int transferId;
     private String transferType;
     private String transferStatus;
-    private Integer transferUserFrom;
-    private Integer transferUserTo;
+    private Integer userFrom;
+    private Integer userTo;
     private double amount;
 
     public int getTransferId() {
@@ -44,19 +44,19 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public Integer getTransferUserFrom() {
-        return transferUserFrom;
+    public Integer getUserFrom() {
+        return userFrom;
     }
 
-    public void setTransferUserFrom(Integer transferUserFrom) {
-        this.transferUserFrom = transferUserFrom;
+    public void setUserFrom(Integer userFrom) {
+        this.userFrom = userFrom;
     }
 
-    public Integer getTransferUserTo() {
-        return transferUserTo;
+    public Integer getUserTo() {
+        return userTo;
     }
 
-    public void setTransferUserTo(Integer transferUserTo) {
-        this.transferUserTo = transferUserTo;
+    public void setUserTo(Integer userTo) {
+        this.userTo = userTo;
     }
 }

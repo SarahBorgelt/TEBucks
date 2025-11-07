@@ -75,12 +75,9 @@ public class JdbcAccountDao implements AccountDao{
 
     private Account mapResultsToAccount(SqlRowSet result){
         Account account = new Account();
-        String accountBalance = result.getString("balance");
-        if(accountBalance != null){
-            account.setBalance(result.getDouble("balance"));
-        } else {
-            throw new DaoException("Unable to find account balance");
-        }
+        account.setAccountId(result.getInt("account_id"));
+        account.setUserId(result.getInt("user_id"));
+        account.setBalance(result.getDouble("balance"));
         return account;
     }
 
