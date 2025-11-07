@@ -85,7 +85,7 @@ public class AccountController {
             try {
                 return transferDao.requestTransfer(
                         newTransferDto.getAmount(),
-                        principal.getName(), // optional, just for reference
+                        principal.getName(),
                         "Pending",
                         newTransferDto.getUserFrom(),
                         newTransferDto.getUserTo()
@@ -129,9 +129,9 @@ public class AccountController {
     }
 
     @PutMapping(path = "/api/transfers/{id}/status")
-    public Transfer updateTransferStatus(@RequestBody TransferStatusUpdateDto transferStatusUpdateDto, Principal principal, @PathVariable Integer transferId){
+    public Transfer updateTransferStatus(@RequestBody TransferStatusUpdateDto transferStatusUpdateDto, Principal principal, @PathVariable Integer id){
         try{
-            Transfer transfer = transferDao.getTransferById(transferId);
+            Transfer transfer = transferDao.getTransferById(id);
             if(transfer == null){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transfer not found");
             }
@@ -152,7 +152,7 @@ public class AccountController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid status");
             }
 
-            return transferDao.updateMyPendingTransfer(transferId, newStatus);
+            return transferDao.updateMyPendingTransfer(id, newStatus);
 
         } catch(DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
