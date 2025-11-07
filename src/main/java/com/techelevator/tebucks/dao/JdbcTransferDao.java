@@ -2,6 +2,7 @@ package com.techelevator.tebucks.dao;
 
 import com.techelevator.tebucks.exception.DaoException;
 import com.techelevator.tebucks.model.Transfer;
+import com.techelevator.tebucks.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,9 +15,11 @@ import java.util.List;
 @Component
 public class JdbcTransferDao implements TransferDao {
     private final JdbcTemplate jdbcTemplate;
+    private UserDao userDao;
 
-    public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
+    public JdbcTransferDao(JdbcTemplate jdbcTemplate, UserDao userDao) {
         this.jdbcTemplate = jdbcTemplate;
+        this.userDao = userDao;
     }
 
     private Transfer mapRowToTransfer(SqlRowSet rs){
@@ -24,20 +27,31 @@ public class JdbcTransferDao implements TransferDao {
         transfer.setTransferId(rs.getInt("transfer_id"));
         transfer.setTransferType(rs.getString("transfer_type"));
         transfer.setTransferStatus(rs.getString("transfer_status"));
-        transfer.setUserFrom(rs.getInt("user_from_id"));
-        transfer.setUserTo(rs.getInt("user_to_id"));
         transfer.setAmount(rs.getDouble("amount"));
+
+        int fromUserId = rs.getInt("user_from_id");
+        int toUserId = rs.getInt("user_to_id");
+
+        User fromUser = userDao.getUserById(fromUserId);
+        User toUser = userDao.getUserById(toUserId);
+
+        transfer.setUserFrom(fromUser);
+        transfer.setUserTo(toUser);
         return transfer;
     }
 
     @Override
-    public List<Transfer> getAllTransfers(Integer userId) {
+    public List<Transfer> getAllTransfers(User user) {
         List<Transfer> transfers = new ArrayList<>();
         String sql = "SELECT * FROM transfer WHERE user_from_id = ? OR user_to_id = ?;";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, userId, userId);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user.getId(), user.getId());
+            //TODO: Need to translate userId into object and take user object instead of number
+            // Update transfer model to account for user object. Pass in JDBCuserDao.
+
             while (results.next()) {
-                transfers.add(mapRowToTransfer(results));
+                Transfer transfer = mapRowToTransfer(results);
+                transfers.add(transfer);
             }
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
@@ -88,7 +102,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public void updateTransfer(Transfer transfer) {
-        String sql = "UPDATE transfers SET transfer_status = ? WHERE transfer_id = ?;";
+        String sql = "UPDATE transfer SET transfer_status = ? WHERE transfer_id = ?;";
         try{
             jdbcTemplate.update(sql, transfer.getTransferStatus(), transfer.getTransferId());
         } catch(CannotGetJdbcConnectionException e){
@@ -117,7 +131,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public List<Transfer> viewPendingTransferStatus(String transferStatus) {
-        String sql = "SELECT * FROM transfer WHERE transfer_status = 'Pending';";
+        String sql = "SELECT * FROM transfer WHERE transfer_status = ?;";
         List<Transfer> transfers = new ArrayList<>();
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferStatus);
@@ -150,7 +164,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public Transfer getTransferStatus(String transferStatus, Integer userId, Integer transferId) {
-        String sql = "SELECT * FROM transfer WHERE transferStatus = ? AND (user_from_id = ? OR user_to_id = ?) AND transfer_id = ?;";
+        String sql = "SELECT * FROM transfer WHERE transfer_status = ? AND (user_from_id = ? OR user_to_id = ?) AND transfer_id = ?;";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, transferStatus, userId, userId, transferId);
         Transfer transferByStatus = null;
         if(result.next()){

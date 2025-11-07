@@ -89,14 +89,14 @@ public class AccountController {
     @GetMapping(path = "/api/account/transfers")
     public List<Transfer> getAllTransfersSentOrReceived(Principal principal){
         try{
-            Integer userId = accountDao.getAccountBalance(principal.getName()).getUserId();
-            return transferDao.getAllTransfers(userId);
+            User currentUser = userDao.getUserByUsername(principal.getName());
+            return transferDao.getAllTransfers(currentUser);
         } catch (DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
         }
     }
 
-    @GetMapping(path = "transfer/id/{transferId}")
+    @GetMapping(path = "/api/transfers/{id}")
     public Transfer getTransferById (@PathVariable int transferId){
         try{
             return (Transfer) transferDao.getTransferById(transferId);
@@ -105,10 +105,10 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "transfer/status/{transferStatus}")
-    public Transfer viewTransfersByPending (@PathVariable String transferStatus){
+    @GetMapping(path = "/api/transfers/status/{transferStatus}")
+    public List<Transfer> viewTransfersByPending (@PathVariable String transferStatus){
         try{
-            return (Transfer) transferDao.viewPendingTransferStatus(transferStatus);
+            return transferDao.viewPendingTransferStatus(transferStatus);
         } catch (DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
         }
@@ -129,8 +129,8 @@ public class AccountController {
                 if(requesteeAccount.getBalance() < transfer.getAmount()){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
                 }
-                accountDao.sendMoney(transfer.getAmount(), transfer.getUserFrom());
-                accountDao.receiveMoney(transfer.getAmount(), transfer.getUserTo());
+                accountDao.sendMoney(transfer.getAmount(), transfer.getUserFrom().getId());
+                accountDao.receiveMoney(transfer.getAmount(), transfer.getUserTo().getId());
             } else if (!"Rejected".equalsIgnoreCase(newStatus)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid transfer status");
             }

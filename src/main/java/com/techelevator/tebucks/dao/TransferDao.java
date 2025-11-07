@@ -1,11 +1,12 @@
 package com.techelevator.tebucks.dao;
 import com.techelevator.tebucks.model.Transfer;
+import com.techelevator.tebucks.model.User;
 
 import java.util.List;
 
 public interface TransferDao {
 
-    List<Transfer> getAllTransfers(Integer userId);
+    List<Transfer> getAllTransfers(User user);
 
     Transfer getTransferById(Integer id);
 
