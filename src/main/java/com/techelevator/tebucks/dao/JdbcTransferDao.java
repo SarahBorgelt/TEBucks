@@ -112,26 +112,23 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public Transfer requestTransfer(Double amount, String transferFromUser, String transferStatus, int transferFromUserId, int transferToUserId) {
-        if(amount<=0){
+        if(amount == null || amount <= 0){
             throw new IllegalArgumentException("Amount must be greater than zero");
-        };
+        }
         if(transferFromUserId == transferToUserId){
             throw new IllegalArgumentException("You cannot request money from yourself");
         }
 
         String sql ="INSERT INTO transfer(transfer_type, transfer_status, user_from_id, user_to_id, amount)" +
-                "VALUES('Request', 'Pending',?,?,?) RETURNING transfer_id;";
-        try{
-            Integer newId = jdbcTemplate.queryForObject(sql, Integer.class, transferFromUserId, transferToUserId, amount);
-            return getTransferById(newId);
-        } catch(CannotGetJdbcConnectionException e){
-            throw new DaoException("Unable to connect to server or database", e);
-        }
+                " VALUES('Request', 'Pending', ?, ?, ?) RETURNING transfer_id;";
+
+        Integer newId = jdbcTemplate.queryForObject(sql, Integer.class, transferFromUserId, transferToUserId, amount);
+        return getTransferById(newId);
     }
 
     @Override
     public List<Transfer> viewPendingTransferStatus(String transferStatus) {
-        String sql = "SELECT * FROM transfer WHERE transfer_status = ?;";
+        String sql = "SELECT * FROM transfer WHERE LOWER(transfer_status) = LOWER(?);";
         List<Transfer> transfers = new ArrayList<>();
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, transferStatus);
