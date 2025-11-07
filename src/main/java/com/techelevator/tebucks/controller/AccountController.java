@@ -5,10 +5,7 @@ import com.techelevator.tebucks.dao.AccountDao;
 import com.techelevator.tebucks.dao.TransferDao;
 import com.techelevator.tebucks.dao.UserDao;
 import com.techelevator.tebucks.exception.DaoException;
-import com.techelevator.tebucks.model.Account;
-import com.techelevator.tebucks.model.NewTransferDto;
-import com.techelevator.tebucks.model.Transfer;
-import com.techelevator.tebucks.model.User;
+import com.techelevator.tebucks.model.*;
 import com.techelevator.tebucks.service.TearsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -17,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.management.loading.PrivateClassLoader;
 import java.security.Principal;
 import java.util.List;
 
@@ -49,23 +47,23 @@ public class AccountController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(path ="/api/transfers")
-    public Transfer newTransfer(@RequestBody NewTransferDto){
-        if (NewTransferDto.get == null || transfer.getTransferUserTo() == null) {
+    public Transfer newTransfer(@RequestBody NewTransferDto newTransferDto){
+        if (newTransferDto.getUserFrom() == null || newTransferDto.getUserTo()== null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User IDs must not be null");
         }
-        if (NewTransferDto.ge() <= 0) {
+        if (newTransferDto.getAmount() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount must be greater than zero");
         }
 
-        Double amountToTransfer = NewTransferDto.getAmount();
-        Account accountFrom = accountDao.getAccountByUserId(transfer.getTransferUserFrom());
-        Account accountTo = accountDao.getAccountByUserId(transfer.getTransferUserTo());
+        Double amountToTransfer = newTransferDto.getAmount();
+        Account accountFrom = accountDao.getAccountByUserId(newTransferDto.getUserFrom());
+        Account accountTo = accountDao.getAccountByUserId(newTransferDto.getUserTo());
 
-        if (NewTransferDto.getTransferUserFrom() == null || transfer.getTransferUserTo() == null) {
+        if (newTransferDto.getUserFrom() == null || newTransferDto.getUserTo()== null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User IDs must not be null");
         }
 
-        if (transfer.getAmount() <= 0) {
+        if (newTransferDto.getAmount() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount must be greater than zero");
         }
         if(accountFrom.getBalance()<amountToTransfer){
@@ -88,9 +86,10 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "/api/transfers/{userId}")
-    public List<Transfer> getAllTransfersSentOrReceived(@PathVariable int userId){
+    @GetMapping(path = "/api/account/transfers")
+    public List<Transfer> getAllTransfersSentOrReceived(Principal principal){
         try{
+            Integer userId = accountDao.getAccountBalance(principal.getName()).getUserId();
             return transferDao.getAllTransfers(userId);
         } catch (DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
@@ -116,7 +115,7 @@ public class AccountController {
     }
 
     @PutMapping(path = "/api/transfers/{id}/status")
-    public Transfer updateTransferStatus(@PathVariable Integer transferId, String transferStatusUpdate, Principal principal){
+    public Transfer updateTransferStatus(@RequestBody TransferStatusUpdateDto transferStatusUpdateDto, Principal principal, @PathVariable Integer transferId){
         try{
             Transfer transfer = transferDao.getTransferById(transferId);
             if(transfer == null){
@@ -124,16 +123,18 @@ public class AccountController {
             }
             Account requesteeAccount = accountDao.getAccountByUserId(userDao.getUserByUsername(principal.getName()).getId());
 
-            if("Approved".equalsIgnoreCase(transferStatusUpdate)){
+            String newStatus = transferStatusUpdateDto.getTransferStatus();
+
+            if("Approved".equalsIgnoreCase(newStatus)){
                 if(requesteeAccount.getBalance() < transfer.getAmount()){
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient funds");
                 }
-                accountDao.sendMoney(transfer.getAmount(), transfer.getTransferUserFrom());
-                accountDao.receiveMoney(transfer.getAmount(), transfer.getTransferUserTo());
-            } else if (!"Rejected".equalsIgnoreCase(transferStatusUpdate)){
+                accountDao.sendMoney(transfer.getAmount(), transfer.getUserFrom());
+                accountDao.receiveMoney(transfer.getAmount(), transfer.getUserTo());
+            } else if (!"Rejected".equalsIgnoreCase(newStatus)){
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid transfer status");
             }
-            Transfer updatedTransfer = transferDao.updateMyPendingTransfer(transferId, transferStatusUpdate);
+            Transfer updatedTransfer = transferDao.updateMyPendingTransfer(transferId, newStatus);
             return updatedTransfer;
         } catch (DaoException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to process request");
