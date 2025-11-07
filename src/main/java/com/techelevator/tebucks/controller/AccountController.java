@@ -41,17 +41,17 @@ public class AccountController {
         return accountDao.getAccountBalance(principal.getName());
     }
 
-    @GetMapping(path = "/users")
+    @GetMapping(path = "/api/users")
     public List<User> getAllUsers(){
         return userDao.getUsers();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(path ="/transfer/{id}")
-    public Transfer newTransfer(@RequestBody Transfer transfer, @PathVariable int id){
+    @PostMapping(path ="/api/transfers")
+    public Transfer newTransfer(@RequestBody Transfer transfer){
         Double amountToTransfer = transfer.getAmount();
-        Account accountFrom = accountDao.getAccountByAccountId(transfer.getTransferUserFrom());
-        Account accountTo = accountDao.getAccountByAccountId(transfer.getTransferUserTo());
+        Account accountFrom = accountDao.getAccountByUserId(transfer.getTransferUserFrom());
+        Account accountTo = accountDao.getAccountByUserId(transfer.getTransferUserTo());
 
         if(accountFrom.getBalance()<amountToTransfer){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Insufficient Funds");
@@ -73,7 +73,7 @@ public class AccountController {
         }
     }
 
-    @GetMapping(path = "/transfer/userid/{userId}")
+    @GetMapping(path = "/api/transfers/{id}")
     public Transfer getAllTransfersSentOrReceived(@PathVariable int userId){
         List<Transfer>getAllTransfersSentOrReceived = null;
         try{
@@ -101,7 +101,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping(path = "transfer/{transferId}/{transferStatus}")
+    @PutMapping(path = "/api/transfers/{id}/status")
     public Transfer updateTransferStatus(@PathVariable Integer transferId, String transferStatusUpdate, Principal principal){
         try{
             Transfer transfer = transferDao.getTransferById(transferId);
