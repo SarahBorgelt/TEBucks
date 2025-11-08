@@ -1,4 +1,112 @@
-# Module 2 Capstone - TEBucks
+# 💸 TEBucks — Peer-to-Peer Payment System (Backend)
+
+*TEBucks is a full-stack project simulating a peer-to-peer money transfer system. Built as part of Tech Elevator’s Module 2 Capstone, this backend provides a secure RESTful API, database management, and external API integration for transaction logging.*
+
+---
+
+
+## Overview
+
+This project was completed collaboratively by **Sarah Borgelt** and **Eric Feen** as part of Tech Elevator’s **Module 2 Capstone**, focusing on building a full-stack **RESTful API backend** for *TEBucks*, a peer-to-peer money transfer system.
+
+![A photograph of the completed application with a functional backend](CompletedProgram.png)
+
+Working together, we implemented all backend functionality required to support the provided frontend at https://tebucks.netlify.app/
+. Our work included:
+
+- Designing and implementing **REST API endpoints** according to the provided specifications.
+
+- Building and extending the **PostgreSQL database schema** to manage user accounts, balances, and transfer tracking.
+
+- Developing **data access layers (DAOs) using JdbcTemplate** for clean, efficient database interactions.
+
+- Implementing **JWT-based authentication and authorization** for secure user sessions.
+
+- Writing integration tests to validate DAO behavior and maintain data consistency.
+
+- Integrating with the **TEARS (Tech Elevator Aberrant Revenue Service) API** to log qualifying transactions and overdraft attempts securely.
+
+- Coordinating **Git version control**, including branching, merging, and resolving conflicts, to simulate a real-world development team workflow.
+
+Through this project, we gained hands-on experience in:
+
+- Building modular, testable Java applications using **Spring Boot**.
+
+- Managing relational data with **SQL** and **Spring JDBC**.
+
+- Producing and consuming **JSON-based REST APIs**.
+
+- Troubleshooting authentication, authorization, and external API integration issues.
+
+- Practicing **pair programming**, communication, and agile-style collaboration in a shared codebase.
+
+This capstone represented a full development cycle—from database design and business logic to integration and testing—resulting in a functioning backend that connects seamlessly with the provided frontend interface.
+
+---
+
+## ⚙️ Tech Stack
+
+### Backend:
+
+- Java 17
+
+- Spring Boot
+
+- Spring JDBC / JdbcTemplate
+
+- PostgreSQL
+
+- JWT Authentication
+
+- RESTful API Architecture
+
+
+### Build & Dependency Management:
+
+- Maven
+
+- Version Control & Collaboration:
+
+- Git / GitHub / GitLab
+
+- Pair Programming (*Sarah Borgelt & Eric Feen*)
+
+### External Integration:
+
+- TEARS API (Tech Elevator Aberrant Revenue Service)
+
+---
+## 🚀 How to Run and Use This Project
+1. Clone the Repository in terminal.
+
+        git clone https://github.com/SarahBorgelt/TEBucks.git
+
+2. Set Up the Database
+
+   - Create a PostgreSQL database named tebucks.
+   - Run the SQL setup script:
+
+       ``database/tebucks.sql``
+
+3. Configure Database Connection 
+
+    1. Update the src/main/resources/application.properties file with your login information:
+        - *spring.datasource.url=jdbc:postgresql://localhost:5432/tebucks*
+        - spring.datasource.username=*your_username*
+        - spring.datasource.password=*your_password*
+
+4. Run the Application
+
+   - **In IntelliJ:** Run → Run 'TebucksApplication'
+
+5. Use with the Frontend
+
+    - The completed frontend is hosted at: https://tebucks.netlify.app/
+    - When the backend is running locally, log in or register through the web app using your credentials.
+
+--- 
+# 🧾 Provided Information: 
+## Module 2 Capstone - TEBucks
 
 Congratulations—you've landed a job with TEBucks, whose product is an online payment service for transferring "TE bucks" between friends. However, they don't have a product yet. You've been tasked with writing a RESTful API server and command-line application.
 
@@ -10,80 +118,80 @@ You must adhere to this design in order for the frontend to work with your backe
 You can and will need to add to the provided models, but do not take away fields that were provided as the
 frontend relies on these field names and data types.
 
-## Use cases
+### Use cases
 
 1. **[COMPLETE]** As a user of the system, I need to be able to register myself with a username and password.
     1. The ability to register has been provided in your starter code.
 2. **[COMPLETE]** As a user of the system, I need to be able to log in using my registered username and password.
     1. Logging in returns an Authentication Token. I need to include this token with all my subsequent interactions with the system outside of registering and logging in.
     2. The ability to log in has been provided in your starter code.
-3. **[COMPLETE]** A newly registered user should start with an initial balance of 1,000 TE Bucks.
-4. **[COMPLETE]** As an authenticated user of the system, I need to be able to see my Account Balance.
-5. **[COMPLETE]** As an authenticated user of the system, I need to be able to *send* a transfer of a specific amount of TE Bucks to a registered user.
-    1. **[COMPLETE]** I should be able to choose from a list of users to send TE Bucks to.
-    2. **[COMPLETE]** A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
-    3. **[COMPLETE]** The receiver's account balance is increased by the amount of the transfer.
-    4. **[COMPLETE]** The sender's account balance is decreased by the amount of the transfer.
-    5. **[COMPLETE]** I can't send more TE Bucks than I have in my account.
-    6. **[COMPLETE]** I can't send a zero or negative amount.
-    7. **[COMPLETE]** I must not be allowed to send money to myself.
-    8. **[COMPLETE]** A Sending Transfer has an initial status of *Approved*.
-6. **[COMPLETE]** As an authenticated user of the system, I need to be able to see transfers I have sent or received.
-7. **[COMPLETE]**  As an authenticated user of the system, I need to be able to retrieve the details of any transfer based upon the transfer ID.
+3. A newly registered user should start with an initial balance of 1,000 TE Bucks.
+4. As an authenticated user of the system, I need to be able to see my Account Balance.
+5. As an authenticated user of the system, I need to be able to *send* a transfer of a specific amount of TE Bucks to a registered user.
+    1. I should be able to choose from a list of users to send TE Bucks to.
+    2. A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
+    3. The receiver's account balance is increased by the amount of the transfer.
+    4. The sender's account balance is decreased by the amount of the transfer.
+    5. I can't send more TE Bucks than I have in my account.
+    6. I can't send a zero or negative amount.
+    7. I must not be allowed to send money to myself.
+    8. A Sending Transfer has an initial status of *Approved*.
+6. As an authenticated user of the system, I need to be able to see transfers I have sent or received.
+7. As an authenticated user of the system, I need to be able to retrieve the details of any transfer based upon the transfer ID.
 8. As an authenticated user of the system, I need to be able to *request* a transfer of a specific amount of TE Bucks from another registered user.
-    1. **[COMPLETE]**  I should be able to choose from a list of users to request TE Bucks from.
-    2. **[COMPLETE]** I must not be allowed to request money from myself.
-    3. **[COMPLETE]**  I can't request a zero or negative amount.
-    4. **[COMPLETE]**  A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
-    5. **[COMPLETE]**  A Request Transfer has an initial status of *Pending*.
-    6. **[COMPLETE]**  No account balance changes until the request is approved.
-    7. **[COMPLETE]**  The transfer request should appear in both users' list of transfers (use case #7).
-9. **[COMPLETE]** As an authenticated user of the system, I need to be able to see my *Pending* transfers.
-10. **[COMPLETE]**  As an authenticated user of the system, I need to be able to either approve or reject a Request Transfer.
-    **[COMPLETE]** I can't "approve" a given Request Transfer for more TE Bucks than I have in my account.
-    2. **[COMPLETE]** The Request Transfer status is *Approved* if I approve, or *Rejected* if I reject the request.
-    3. **[COMPLETE]** If the transfer is approved, the requester's account balance is increased by the amount of the request.
-    4. **[COMPLETE]** If the transfer is approved, the requestee's account balance is decreased by the amount of the request.
-    5. **[COMPLETE]** If the transfer is rejected, no account balance changes.
+    1. I should be able to choose from a list of users to request TE Bucks from.
+    2. I must not be allowed to request money from myself.
+    3. I can't request a zero or negative amount.
+    4. A transfer includes the User IDs of the from and to users and the amount of TE Bucks.
+    5. A Request Transfer has an initial status of *Pending*.
+    6. No account balance changes until the request is approved.
+    7. The transfer request should appear in both users' list of transfers (use case #7).
+9. As an authenticated user of the system, I need to be able to see my *Pending* transfers.
+10. As an authenticated user of the system, I need to be able to either approve or reject a Request Transfer.
+    1. I can't "approve" a given Request Transfer for more TE Bucks than I have in my account.
+    2. The Request Transfer status is *Approved* if I approve, or *Rejected* if I reject the request.
+    3. If the transfer is approved, the requester's account balance is increased by the amount of the request.
+    4. If the transfer is approved, the requestee's account balance is decreased by the amount of the request.
+    5. If the transfer is rejected, no account balance changes.
 11. As a Tech Elevator Banking System, I need to log specific transactions with the Tech Elevator Aberrant Revenue Service (TEARS).
     1. Login to TEARS using the `/login` endpoint. This endpoint will return a JWT token, which will be used in all subsequent requests to log information.
     2. I must log any transfer of at least $1,000 TE Bucks or more.
     3. I must log any transfer attempt that would result in an overdraft.
 
-## Prepare your TEARS Account
+### Prepare your TEARS Account
 In order to communicate with TEARS, you need to create an account with a username and password. Create your user account for TEARS using Postman and the registration endpoint `/register`, be sure to record your username and password. The full documentation for the TEARS API is located at https://tears.azurewebsites.net/.
 
-## Sample screens
+### Sample screens
 
-### Use case 4: Current balance
+#### Use case 4: Current balance
 ![Use case 4: Current balance](resources/tebucks_usecase_4.png "Current Balance")
 
-### Use case 5: Send TE Bucks
+#### Use case 5: Send TE Bucks
 ![Use case 5: Send TE Bucks](resources/tebucks_usecase_5.png "Send TE Bucks")
 
-### Use case 6: View transfers
+#### Use case 6: View transfers
 ![Use case 6: View transfers](resources/tebucks_usecase_6.png "View transfers")
 
-### Use case 7: Transfer details
+#### Use case 7: Transfer details
 ![Use case 7: Transfer details](resources/tebucks_usecase_6.png "Transfer details")
 
-### Use case 8: Requesting TE Bucks
+#### Use case 8: Requesting TE Bucks
 ![Use case 9: Requesting TE Bucks](resources/tebucks_usecase_9.png "Requesting TE Bucks")
 
-### Use case 9: Pending requests
+#### Use case 9: Pending requests
 ![Use case 10: Pending requests](resources/tebucks_usecase_6.png "Pending requests")
 
-### Use case 10: Approve or reject pending transfer
+#### Use case 10: Approve or reject pending transfer
 ![Use case 11: Approve or reject pending transfer](resources/tebucks_usecase_10.png "Approve or reject pending transfer")
 
-## How to set up the database
+### How to set up the database
 
 
 Create a new Postgres database called `tebucks`. Run the `database/tebucks.sql` script in pgAdmin to set up the database.
 
 The very first task that you should complete after digesting the requirements is to build the remainder of database. Add the tables and data necessary for completing this project to the `database/tebucks.sql` script. Rerun the `database/tebucks.sql` script whenever would like to apply your changes.
 
-### Datasource
+#### Datasource
 
 A Datasource has been configured for you in `/src/resources/application.properties`.
 
@@ -95,7 +203,7 @@ spring.datasource.username=postgres
 spring.datasource.password=postgres1
 ```
 
-### JdbcTemplate
+#### JdbcTemplate
 
 If you look in `/src/main/java/com/techelevator/tebucks/security/dao`, you'll see `JdbcUserDao`. This is an example of how to get an instance of `JdbcTemplate` in your DAOs. If you declare a field of type `JdbcTemplate` and add it as an argument to the constructor, Spring automatically injects an instance for you:
 
@@ -111,10 +219,10 @@ public class JdbcUserDao implements UserDao {
 }
 ```
 
-## Testing
+### Testing
 
 
-### DAO integration tests
+#### DAO integration tests
 
 `com.techelevator.tebucks.dao.BaseDaoTests` has been provided for you to use as a base class for any DAO integration test. It initializes a Datasource for testing and manages rollback of database changes between tests.
 
@@ -122,7 +230,7 @@ public class JdbcUserDao implements UserDao {
 
 Remember that when testing, you're using a copy of the real database. The schema and data for the test database are defined in `/src/test/resources/test-data.sql`. The schema in this file matches the schema defined in `database/tebucks.sql`.
 
-## API design
+### API design
 Provided
 
 | Request Method | Path      | Request Body    | Returns          |
@@ -199,3 +307,11 @@ TransferStatusUpdateDto
     "transferStatus" : "A string for the transer status: Pending, Approved, or Rejected"
 }
 ```
+
+## 👩‍💻 Contributors
+This project was completed collaboratively by two backend developers. To learn more or connect with us, feel free to check out our profiles below:
+
+| Name | LinkedIn | GitHub |
+|------|----------|--------|
+| **Sarah Borgelt** | [LinkedIn](https://www.linkedin.com/in/sarahnicole1) | [GitHub](https://github.com/SarahBorgelt) |
+| **Eric Feen** | [LinkedIn](https://www.linkedin.com/in/ericfeen/) | [GitHub](https://github.com/itsa77) |

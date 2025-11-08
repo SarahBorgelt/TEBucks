@@ -13,9 +13,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -121,7 +118,6 @@ public class TearsService {
                     "TEARS login failed: " + e.getMessage());
         }
     }
-
 
 
     public void logTransfer(Transfer transfer) {
