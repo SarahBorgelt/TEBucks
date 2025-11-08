@@ -66,39 +66,6 @@ public class TearsService {
                 .build();
     }
 
-    public void addTransfer(Transfer newTransfer) {
-        ensureLoggedIn();
-        try {
-            restClient.post()
-                    .uri(LOG_ENDPOINT)
-                    //.contentType(MediaType.APPLICATION_JSON)
-                    .body(newTransfer)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (RestClientResponseException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Failed to add transfer to TEARS: " + e.getRawStatusCode() + " " + e.getResponseBodyAsString());
-        }
-    }
-
-
-    public boolean updateTransfer(Transfer updatedTransfer){
-        boolean success = false;
-        try{
-            restClient.put()
-                    .uri(LOG_ENDPOINT + updatedTransfer.getTransferId())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(updatedTransfer)
-                    .retrieve()
-                    .toBodilessEntity();
-
-            success = true;
-        } catch(RestClientResponseException e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return success;
-    }
-
     public void registerNewUser(String username, String password) {
         Map<String, String> body = new HashMap<>();
         body.put("username", username);
@@ -169,8 +136,7 @@ public class TearsService {
         tearsPayload.put("username_from", usernameFrom);
         tearsPayload.put("username_to", usernameTo);
         tearsPayload.put("Amount", transfer.getAmount());                                    //-------------------
-        //tearsPayload.put("TransferType", transfer.getTransferType());
-       // tearsPayload.put("TransferStatus", transfer.getTransferStatus());
+
 
         try {
             restClient.post()
