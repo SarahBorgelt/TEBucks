@@ -54,7 +54,7 @@ public class AccountController {
         if (newTransferDto.getAmount() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount must be greater than zero");
         }
-
+        //Missing try-catch
         Account accountFrom = accountDao.getAccountByUserId(newTransferDto.getUserFrom());
         Account accountTo = accountDao.getAccountByUserId(newTransferDto.getUserTo());
         double senderBalanceBefore = accountFrom.getBalance();
@@ -206,4 +206,35 @@ public class AccountController {
         }
     }
 
+    public AccountDao getAccountDao() {
+        return accountDao;
+    }
+
+    public void setAccountDao(AccountDao accountDao) {
+        this.accountDao = accountDao;
+    }
+
+    public UserDao getUserDao() {
+        return userDao;
+    }
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public TransferDao getTransferDao() {
+        return transferDao;
+    }
+
+    public void setTransferDao(TransferDao transferDao) {
+        this.transferDao = transferDao;
+    }
+
+    public TearsService getTearsService() {
+        return tearsService;
+    }
+
+    public void setTearsService(TearsService tearsService) {
+        this.tearsService = tearsService;
+    }
 }
