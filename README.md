@@ -4,12 +4,15 @@
 
 ---
 
+<details>
+
+<summary>Overview</summary>
 
 ## Overview
-
 This project was completed collaboratively by **Sarah Borgelt** and **Eric Feen** as part of Tech Elevator’s **Module 2 Capstone**, focusing on building a full-stack **RESTful API backend** for *TEBucks*, a peer-to-peer money transfer system.
 
 ![A photograph of the completed application with a functional backend](CompletedProgram.png)
+
 
 Working together, we implemented all backend functionality required to support the provided frontend at https://tebucks.netlify.app/
 . Our work included:
@@ -42,7 +45,13 @@ Through this project, we gained hands-on experience in:
 
 This capstone represented a full development cycle—from database design and business logic to integration and testing—resulting in a functioning backend that connects seamlessly with the provided frontend interface.
 
+</details>
+
 ---
+
+<details>
+
+<summary>Tech Stack</summary>
 
 ## ⚙️ Tech Stack
 
@@ -75,7 +84,14 @@ This capstone represented a full development cycle—from database design and bu
 
 - TEARS API (Tech Elevator Aberrant Revenue Service)
 
+</details>
+
 ---
+
+<details>
+
+<summary>How to Run and Use This Project</summary>
+
 ## 🚀 How to Run and Use This Project
 1. Clone the Repository in terminal.
 
@@ -104,7 +120,15 @@ This capstone represented a full development cycle—from database design and bu
     - The completed frontend is hosted at: https://tebucks.netlify.app/
     - When the backend is running locally, log in or register through the web app using your credentials.
 
+</details>
+
 --- 
+
+<details>
+
+<summary>Provided Information</summary>
+
+
 # 🧾 Provided Information: 
 ## Module 2 Capstone - TEBucks
 
@@ -308,6 +332,14 @@ TransferStatusUpdateDto
 }
 ```
 
+</details>
+
+---
+
+<details>
+
+<summary>Contributors</summary>
+
 ## 👩‍💻 Contributors
 This project was completed collaboratively by two backend developers. To learn more or connect with us, feel free to check out our profiles below:
 
@@ -315,3 +347,5 @@ This project was completed collaboratively by two backend developers. To learn m
 |------|----------|--------|
 | **Sarah Borgelt** | [LinkedIn](https://www.linkedin.com/in/sarahnicole1) | [GitHub](https://github.com/SarahBorgelt) |
 | **Eric Feen** | [LinkedIn](https://www.linkedin.com/in/ericfeen/) | [GitHub](https://github.com/itsa77) |
+
+</details>
